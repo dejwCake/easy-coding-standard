@@ -145,16 +145,16 @@ final class File extends BaseFile
                 }
             }
 
-            if (!isset($this->tokenListeners[$token['code']])) {
-                continue;
-            }
-
             if ($disabledAllSniffs) {
                 continue;
             }
 
+            if (!isset($this->tokenListeners[$token['code']])) {
+                continue;
+            }
+
             foreach ($this->tokenListeners[$token['code']] as $sniff) {
-                if ($disabledSniffs[get_class($sniff)]) {
+                if (isset($disabledSniffs[get_class($sniff)])) {
                     continue;
                 }
 
