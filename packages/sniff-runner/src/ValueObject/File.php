@@ -11,6 +11,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Standards\PSR2\Sniffs\Classes\PropertyDeclarationSniff;
 use PHP_CodeSniffer\Standards\PSR2\Sniffs\Methods\MethodDeclarationSniff;
 use PHP_CodeSniffer\Util\Common;
+use SlevomatCodingStandard\Sniffs\Classes\ClassStructureSniff;
 use SlevomatCodingStandard\Sniffs\ControlStructures\AssignmentInConditionSniff;
 use Symplify\CodingStandard\Sniffs\Debug\CommentedOutCodeSniff;
 use Symplify\EasyCodingStandard\Application\AppliedCheckersCollector;
