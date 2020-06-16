@@ -11,6 +11,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Standards\PSR2\Sniffs\Classes\PropertyDeclarationSniff;
 use PHP_CodeSniffer\Standards\PSR2\Sniffs\Methods\MethodDeclarationSniff;
 use PHP_CodeSniffer\Util\Common;
+use SlevomatCodingStandard\Sniffs\Classes\ClassStructureSniff;
 use SlevomatCodingStandard\Sniffs\ControlStructures\AssignmentInConditionSniff;
 use Symplify\CodingStandard\Sniffs\Debug\CommentedOutCodeSniff;
 use Symplify\EasyCodingStandard\Application\AppliedCheckersCollector;
@@ -122,13 +123,42 @@ final class File extends BaseFile
     {
         $this->parse();
         $this->fixer->startFile($this);
+        $disabledSniffs = [];
+        $disabledAllSniffs = false;
 
         foreach ($this->tokens as $stackPtr => $token) {
-            if (! isset($this->tokenListeners[$token['code']])) {
+            if ($token['code'] === T_PHPCS_DISABLE) {
+                if (empty($token['sniffCodes'])) {
+                    $disabledAllSniffs = true;
+                } else {
+                    foreach ($token['sniffCodes'] as $sniffCode => $value) {
+                        $disabledSniffs[$sniffCode] = true;
+                    }
+                }
+            }
+            if ($token['code'] === T_PHPCS_ENABLE) {
+                if (empty($token['sniffCodes'])) {
+                    $disabledAllSniffs = false;
+                } else {
+                    foreach ($token['sniffCodes'] as $sniffCode => $value) {
+                        unset($disabledSniffs[$sniffCode]);
+                    }
+                }
+            }
+
+            if ($disabledAllSniffs) {
+                continue;
+            }
+
+            if (!isset($this->tokenListeners[$token['code']])) {
                 continue;
             }
 
             foreach ($this->tokenListeners[$token['code']] as $sniff) {
+                if (isset($disabledSniffs[get_class($sniff)])) {
+                    continue;
+                }
+
                 if ($this->skipper->shouldSkipCheckerAndFile($sniff, $this->fileInfo)) {
                     continue;
                 }
